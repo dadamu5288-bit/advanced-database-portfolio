@@ -70,5 +70,40 @@ SELECT account_id, balance FROM accounts WHERE account_id = 1;
 
 
 -- =====================================================
--- Concurrency demos (Demo 3 onward) will be added below
+-- Demo 3: lost update (the problem)
+-- Tab A and Tab B are two separate Query Tool sessions (two tellers).
+-- Run each step in the tab shown, in this exact order.
+-- =====================================================
+
+-- Reset (Tab A)
+UPDATE accounts SET balance = 1000 WHERE account_id = 1;
+SELECT account_id, balance FROM accounts WHERE account_id = 1;
+-- Expected: 1000.00
+
+-- Step 1 (Tab A): start a transaction and read the balance
+BEGIN;
+SELECT balance FROM accounts WHERE account_id = 1;
+-- Expected: 1000.00
+
+-- Step 2 (Tab B): also start a transaction and read the balance
+BEGIN;
+SELECT balance FROM accounts WHERE account_id = 1;
+-- Expected: 1000.00 (A has not saved anything yet)
+
+-- Step 3 (Tab A): withdraw 800 and save
+UPDATE accounts SET balance = 1000 - 800 WHERE account_id = 1;
+COMMIT;
+
+-- Step 4 (Tab B): withdraw 300 using the old balance it read earlier, and save
+UPDATE accounts SET balance = 1000 - 300 WHERE account_id = 1;
+COMMIT;
+
+-- Step 5 (either tab): check the result
+SELECT account_id, balance FROM accounts WHERE account_id = 1;
+-- Expected: 700.00. A total of 1100 was withdrawn from an account holding 1000,
+-- so Tab A's update was lost. This is the lost update problem.
+
+
+-- =====================================================
+-- Demo 4 (locking fix) and Demo 5 (isolation levels) will be added below
 -- =====================================================
