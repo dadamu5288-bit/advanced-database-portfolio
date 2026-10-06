@@ -105,5 +105,40 @@ SELECT account_id, balance FROM accounts WHERE account_id = 1;
 
 
 -- =====================================================
--- Demo 4 (locking fix) and Demo 5 (isolation levels) will be added below
+-- Demo 4: the fix using SELECT ... FOR UPDATE (row locking)
+-- Tab A takes the lock first; Tab B has to wait for it.
+-- =====================================================
+
+-- Before starting: run ROLLBACK; in both tabs, then reset (Tab A)
+UPDATE accounts SET balance = 1000 WHERE account_id = 1;
+SELECT account_id, balance FROM accounts WHERE account_id = 1;
+-- Expected: 1000.00
+
+-- Step 1 (Tab A): start a transaction and lock the row
+BEGIN;
+SELECT balance FROM accounts WHERE account_id = 1 FOR UPDATE;
+-- Expected: 1000.00 (row is now locked by Tab A)
+
+-- Step 2 (Tab B): try to lock the same row
+BEGIN;
+SELECT balance FROM accounts WHERE account_id = 1 FOR UPDATE;
+-- Expected: no result yet. Tab B waits because Tab A holds the lock.
+
+-- Step 3 (Tab A): withdraw 800 and release the lock
+UPDATE accounts SET balance = 200 WHERE account_id = 1;
+COMMIT;
+
+-- Step 4 (Tab B): nothing to type. The waiting query finishes by itself.
+-- Expected: Tab B now shows 200.00 (not the old 1000.00)
+
+-- Step 5 (Tab B): 300 cannot be withdrawn from 200, so cancel
+ROLLBACK;
+
+-- Step 6: check the final balance
+SELECT account_id, balance FROM accounts WHERE account_id = 1;
+-- Expected: 200.00. No update was lost. Compare with Demo 3, which ended at 700.00.
+
+
+-- =====================================================
+-- Demo 5 (isolation levels) will be added below
 -- =====================================================
