@@ -140,5 +140,59 @@ SELECT account_id, balance FROM accounts WHERE account_id = 1;
 
 
 -- =====================================================
--- Demo 5 (isolation levels) will be added below
+-- Demo 5: isolation levels
+-- Same two tabs. Compare REPEATABLE READ with the default READ COMMITTED.
 -- =====================================================
+
+-- Setup: run ROLLBACK; in both tabs, then reset (Tab A)
+UPDATE accounts SET balance = 1000 WHERE account_id = 1;
+SELECT account_id, balance FROM accounts WHERE account_id = 1;
+-- Expected: 1000.00
+
+-- ---------- Part 1: REPEATABLE READ ----------
+
+-- Step 1 (Tab A): start with a frozen snapshot and read
+BEGIN ISOLATION LEVEL REPEATABLE READ;
+SELECT balance FROM accounts WHERE account_id = 1;
+-- Expected: 1000.00
+
+-- Step 2 (Tab B): change the balance (auto-saved, no BEGIN)
+UPDATE accounts SET balance = 500 WHERE account_id = 1;
+SELECT balance FROM accounts WHERE account_id = 1;
+-- Expected: 500.00
+
+-- Step 3 (Tab A): read again
+SELECT balance FROM accounts WHERE account_id = 1;
+-- Expected: still 1000.00 (Tab A sees its own snapshot)
+
+-- Step 4 (Tab A): try to change the row
+UPDATE accounts SET balance = balance - 100 WHERE account_id = 1;
+-- Expected: ERROR: could not serialize access due to concurrent update
+
+-- Step 5 (Tab A): clean up
+ROLLBACK;
+
+-- ---------- Part 2: READ COMMITTED (default) ----------
+
+-- Reset (Tab A)
+UPDATE accounts SET balance = 1000 WHERE account_id = 1;
+SELECT account_id, balance FROM accounts WHERE account_id = 1;
+-- Expected: 1000.00
+
+-- Step 1 (Tab A): start a normal transaction and read
+BEGIN;
+SELECT balance FROM accounts WHERE account_id = 1;
+-- Expected: 1000.00
+
+-- Step 2 (Tab B): change the balance (auto-saved)
+UPDATE accounts SET balance = 500 WHERE account_id = 1;
+
+-- Step 3 (Tab A): read again
+SELECT balance FROM accounts WHERE account_id = 1;
+-- Expected: 500.00 (Tab A sees Tab B's saved change)
+
+-- Step 4 (Tab A): clean up
+ROLLBACK;
+
+-- Put the test accounts back to a clean state
+UPDATE accounts SET balance = 50000 WHERE account_id IN (1,2);
