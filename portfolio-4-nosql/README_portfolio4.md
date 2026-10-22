@@ -1,7 +1,11 @@
 # Portfolio 4 - NoSQL and Advanced Data Models
 
+
+
 Case study: TrustLink Microfinance Bank (simulated)
-Database: MongoDB Community Server, database `bankdb\_nosql` (document model)
+Database: MongoDB Community Server, database `bankdb\\\\\\\_nosql` (document model)
+
+
 
 ## Files
 
@@ -11,11 +15,15 @@ Database: MongoDB Community Server, database `bankdb\_nosql` (document model)
 |mongo\_demo.js|All the commands I ran (insert, find, update, aggregate, index)|
 |Screenshots 01 to 14 (.png)|Evidence for each step (listed below)|
 
+## 
+
 ## How to run
 
 1. Install MongoDB Community Server and MongoDB Compass.
 2. In Compass, connect to `mongodb://localhost:27017`, then open the MongoDB shell from the connection.
-3. Paste the numbered sections of `mongo\_demo.js` into the shell one at a time.
+3. Paste the numbered sections of `mongo\\\\\\\_demo.js` into the shell one at a time.
+
+## 
 
 ## Evidence
 
@@ -29,9 +37,13 @@ Database: MongoDB Community Server, database `bankdb\_nosql` (document model)
 |11|Aggregation: total amount per channel|
 |12, 13, 14|Query plan before the index, creating the index, and the plan after|
 
+## 
+
 ## Why MongoDB for this part of the bank
 
 In MongoDB I stored the customer profiles and the transaction logs of the TrustLink bank. I chose MongoDB for these because their structure changes from record to record. A profile holds KYC details, devices and alert preferences that differ between customers, and each log has different fields depending on the channel: ATM logs have an atm field, POS logs have a pos field, and branch deposits have a branch field. In PostgreSQL this would need many empty columns or several extra tables. I kept balances, transfers and the ledger in PostgreSQL because money needs strict rules such as ACID transactions, foreign keys and CHECK constraints, which Portfolio 3 showed. When I flagged the ATM-310 withdrawal, I added the flagged and flag\_reason fields to that one document without changing any other document, which would have meant altering the whole table in SQL.
+
+## 
 
 ## A challenge I faced
 

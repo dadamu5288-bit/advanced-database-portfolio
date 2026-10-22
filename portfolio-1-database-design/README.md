@@ -2,23 +2,29 @@
 
 Case study: TrustLink Microfinance Bank (simulated)
 
+
+
 ## What is in this folder
 
-|File|What it is|
+|File|Description|
 |-|-|
-|case-study.md|Description of the bank, its users, data and operations|
+|case-study.md| the bank, its users, data and operations|
 |er-diagram.drawio / er-diagram.png|ER diagram of the six tables|
 |schema.sql|SQL that creates the tables, keys and constraints|
 |normalisation.md|Explanation of 1NF, 2NF and 3NF for my design|
-|01-bankdb-created.png|Screenshot: the bankdb database created in pgAdmin|
-|02-tables-created.png|Screenshot: the six tables created|
+|01-bankdb-created.png|A screenshot of the bankdb database created in pgAdmin|
+|02-tables-created.png|A Screenshot of the six tables created|
+
+## 
 
 ## How I built and tested it
 
-1. I created a PostgreSQL database called `bankdb` in pgAdmin 4.
+1. I created a PostgreSQL database called bankdb in pgAdmin 4.
 2. I drew the ER diagram in draw.io.
-3. I opened `schema.sql` in the pgAdmin Query Tool on `bankdb` and pressed F5.
+3. I opened schema.sql in the pgAdmin Query Tool on bankdb and pressed F5.
 4. I refreshed the Tables list and checked that all six tables appeared.
+
+## 
 
 ## Keys and constraints
 
@@ -27,6 +33,8 @@ Case study: TrustLink Microfinance Bank (simulated)
 * NOT NULL: important fields such as names and amounts cannot be empty.
 * UNIQUE: email, account number and transaction reference cannot repeat.
 * CHECK: balance cannot be negative, amounts must be above zero, and status values must be valid.
+
+## 
 
 ## A challenge I faced
 
